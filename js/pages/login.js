@@ -52,7 +52,7 @@ async function init() {
 
   document.getElementById('login-btn').addEventListener('click', () => {
     localStorage.setItem('oauth_pending', '1');
-    window.location.href = loginUrl();
+    window.location.href = `${loginUrl()}?from=${encodeURIComponent(window.location.origin)}`;
   });
 }
 
