@@ -8,7 +8,12 @@ async function req(path, opts = {}) {
   });
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
-    try { const d = await res.json(); msg = d.message || d.error || msg; } catch {}
+    let errKey = null;
+    try { const d = await res.json(); msg = d.message || d.error || msg; errKey = d.error; } catch {}
+    if (res.status === 403 && errKey === 'profile_incomplete') {
+      window.location.href = '/profile/?required=true';
+      return null;
+    }
     throw new Error(msg);
   }
   return res.json();
@@ -47,6 +52,9 @@ export const createProject  = (data)      => api.post('/projects', data);
 export const updateProject  = (id, data)  => api.patch(`/projects/${id}`, data);
 export const deleteProject  = (id)        => api.delete(`/projects/${id}`);
 
+export const addProjectMember    = (id, data)   => api.post(`/projects/${id}/members`, data);
+export const removeProjectMember = (id, userId) => api.delete(`/projects/${id}/members/${userId}`);
+
 // Requests
 export const getRequests       = (status)       => api.get(`/requests${status ? '?status=' + status : ''}`);
 export const getRequest        = (id)           => api.get(`/requests/${id}`);
@@ -72,6 +80,9 @@ export const rejectReturn   = (id, data)  => api.patch(`/returns/${id}/reject`, 
 export const getNotifications = (page, limit) => api.get(`/notifications?page=${page}&limit=${limit}`);
 export const markNotifRead    = (id)           => api.patch(`/notifications/${id}/read`);
 export const markAllRead      = ()             => api.patch('/notifications/read-all');
+
+// Users
+export const updateMe      = (data)      => api.patch('/users/me', data);
 
 // Users (admin)
 export const getUsers      = (role) => api.get(`/users${role ? '?role=' + role : ''}`);

@@ -7,17 +7,18 @@ async function init() {
   if (!user) return;
 
   const id = new URLSearchParams(window.location.search).get('id');
-  if (!id) { window.location.href = 'items.html'; return; }
+  if (!id) { window.location.href = '/items/'; return; }
 
   const app = document.getElementById('app');
   const { item } = await getItem(id);
+  const avail = item.available_quantity > 0;
 
   app.innerHTML = `
     <button class="back-btn" onclick="history.back()">← กลับ</button>
-    <div class="card item-detail-card" style="padding:0;overflow:hidden">
+    <div class="card item-detail-card" style="padding:0;overflow:hidden;max-width:680px">
       ${item.image_r2_key
         ? `<img src="${photoUrl(item.image_r2_key)}" alt="${h(item.name)}" class="item-detail-img">`
-        : `<div class="item-detail-placeholder">📦</div>`}
+        : `<div class="item-detail-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>`}
       <div class="item-detail-body">
         <h1 class="item-detail-name">${h(item.name)}</h1>
         ${item.category ? `<span class="item-tag">${h(item.category)}</span>` : ''}
@@ -36,8 +37,13 @@ async function init() {
             <span class="item-stat-value stat-red">${item.repair_quantity}</span>
           </div>
         </div>
+        <div style="padding-top:1.25rem;border-top:1px solid var(--border);margin-top:.25rem">
+          ${avail
+            ? `<a href="/new-request/?item_id=${h(id)}" class="btn btn-primary">ยืมอุปกรณ์นี้</a>`
+            : `<button class="btn btn-primary" disabled style="opacity:.45;cursor:default">ไม่มีในสต๊อก</button>`}
+          <a href="/items/" class="btn btn-secondary" style="margin-left:.5rem">← กลับสต๊อก</a>
+        </div>
       </div>
     </div>`;
 }
-
 init();

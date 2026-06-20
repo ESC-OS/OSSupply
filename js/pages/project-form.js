@@ -29,21 +29,23 @@ async function init() {
           <input class="form-input" name="name" required value="${val('name')}">
         </div>
         <div class="form-group">
-          <label class="form-label">วัตถุประสงค์ <span class="form-required">*</span></label>
-          <input class="form-input" name="purpose" required value="${val('purpose')}">
-        </div>
-        <div class="form-group">
           <label class="form-label">คำอธิบาย</label>
           <textarea class="form-textarea" name="description">${val('description')}</textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">วันที่เริ่มต้น <span class="form-required">*</span></label>
-            <input class="form-input" type="date" name="start_date" required value="${val('start_date', '').slice(0, 10)}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+              <label class="form-label" style="margin:0">วันที่เริ่มต้น <span class="form-required">*</span></label>
+              <button type="button" class="btn btn-sm btn-secondary" id="today-start">วันนี้</button>
+            </div>
+            <input class="form-input" type="date" name="start_date" id="start_date" required value="${val('start_date', '').slice(0, 10)}">
           </div>
           <div class="form-group">
-            <label class="form-label">วันที่สิ้นสุด <span class="form-required">*</span></label>
-            <input class="form-input" type="date" name="end_date" required value="${val('end_date', '').slice(0, 10)}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+              <label class="form-label" style="margin:0">วันที่สิ้นสุด <span class="form-required">*</span></label>
+              <button type="button" class="btn btn-sm btn-secondary" id="today-end">วันนี้</button>
+            </div>
+            <input class="form-input" type="date" name="end_date" id="end_date" required value="${val('end_date', '').slice(0, 10)}">
           </div>
         </div>
         <div class="form-actions">
@@ -55,6 +57,14 @@ async function init() {
       </form>
     </div>`;
 
+  const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+  document.getElementById('today-start').addEventListener('click', () => {
+    document.getElementById('start_date').value = today;
+  });
+  document.getElementById('today-end').addEventListener('click', () => {
+    document.getElementById('end_date').value = today;
+  });
+
   document.getElementById('project-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd    = new FormData(e.target);
@@ -65,20 +75,19 @@ async function init() {
     btn.textContent = 'กำลังบันทึก...';
 
     const data = {
-      name:        fd.get('name'),
-      purpose:     fd.get('purpose'),
-      description: fd.get('description') || undefined,
-      start_date:  fd.get('start_date'),
-      end_date:    fd.get('end_date'),
+      name:             fd.get('name'),
+      description:      fd.get('description') || undefined,
+      start_date:       fd.get('start_date'),
+      end_date:         fd.get('end_date'),
     };
 
     try {
       if (isEdit) {
         await updateProject(id, data);
-        window.location.href = `project-detail.html?id=${id}`;
+        window.location.href = `/project-detail/?id=${id}`;
       } else {
         const { project } = await createProject(data);
-        window.location.href = `project-detail.html?id=${project.id}`;
+        window.location.href = `/project-detail/?id=${project.id}`;
       }
     } catch (err) {
       errEl.innerHTML = `<div class="alert alert-error">${h(err.message)}</div>`;

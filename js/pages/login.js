@@ -16,7 +16,7 @@ async function init() {
 
   try {
     const { user } = await getMe();
-    if (user) { window.location.href = '/dashboard.html'; return; }
+    if (user) { window.location.href = '/dashboard/'; return; }
   } catch {}
 
   const search = new URLSearchParams(window.location.search);
@@ -34,7 +34,7 @@ async function init() {
     <div class="login-page">
       <div class="login-card">
         <img src="/public/ESC_logo.png" alt="กวศ." class="login-logo">
-        <h1 class="login-title">คลังอุปกรณ์</h1>
+        <h1 class="login-title">Operation Support</h1>
         <p class="login-subtitle">คณะวิศวกรรมศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย</p>
         ${errMsg ? `<div class="alert alert-error">${h(errMsg)}</div>` : ''}
         <button class="login-btn" id="login-btn">

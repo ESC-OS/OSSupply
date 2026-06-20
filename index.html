@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=dashboard.html">
-  <title>คลังอุปกรณ์ กวศ.</title>
+  <title>Operation Support — กวศ.</title>
   <link rel="icon" type="image/png" href="public/ESC_logo.png">
 </head>
-<body></body>
+<body>
+  <script type="module">
+    import { getMe } from './js/api.js';
+    try {
+      const { user } = await getMe();
+      window.location.replace(user ? '/dashboard/' : '/login/');
+    } catch {
+      window.location.replace('/login/');
+    }
+  </script>
+</body>
 </html>

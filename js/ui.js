@@ -43,46 +43,108 @@ export function showError(msg) {
   setTimeout(() => el.remove(), 5000);
 }
 
+// Render the footer (idempotent — only inserts once)
+function renderFooter() {
+  if (document.getElementById('site-footer')) return;
+  const footer = document.createElement('footer');
+  footer.id = 'site-footer';
+  footer.className = 'site-footer';
+  footer.innerHTML = `
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <img src="/public/ESC_logo.png" alt="กวศ.">
+          <span class="footer-brand-name">Operation Support</span>
+        </div>
+        <p class="footer-desc">
+          ระบบยืม-คืนอุปกรณ์<br>
+          งานพัสดุและสำนักงาน คณะวิศวกรรมศาสตร์<br>
+          จุฬาลงกรณ์มหาวิทยาลัย
+        </p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">เมนู</div>
+        <div class="footer-links">
+          <a href="/dashboard/">หน้าแรก</a>
+          <a href="/items/">สต๊อกอุปกรณ์</a>
+          <a href="/requests/">คำขอยืม</a>
+          <a href="/projects/">โครงการ</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">ข้อมูล</div>
+        <div class="footer-links">
+          <a href="/policy/">Policy</a>
+          <a href="/contact/">Contact Us</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">ติดต่อ</div>
+        <p class="footer-desc">
+          อีเมล: operation.support@eng.chula.ac.th<br>
+          โทร: 0-2218-6000<br>
+          จันทร์ – ศุกร์ 08:30 – 16:30 น.
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© ${new Date().getFullYear()} Faculty of Engineering, Chulalongkorn University. All rights reserved.</span>
+    </div>`;
+  const modal = document.getElementById('modal-root');
+  if (modal) modal.before(footer);
+  else document.body.appendChild(footer);
+}
+
 // Render the navbar
 export function renderNavbar(user, unread = 0) {
   const root = document.getElementById('navbar-root');
   if (!root || !user) return;
-  const cur      = window.location.pathname.split('/').pop();
-  const isStaff  = user.role === 'staff' || user.role === 'admin';
-  const active   = (file) => cur === file ? 'active' : '';
+  const seg     = '/' + (window.location.pathname.split('/').filter(Boolean)[0] || '');
+  const active  = (path) => seg === path ? 'active' : '';
+  const isStaff = user.role === 'staff' || user.role === 'admin';
 
   root.innerHTML = `
     <nav class="nav">
       <div class="nav-inner">
-        <a href="dashboard.html" class="nav-brand">
-          <img src="public/ESC_logo.png" alt="กวศ.">
-          <span class="nav-brand-name">คลังอุปกรณ์ กวศ.</span>
+        <a href="/dashboard/" class="nav-brand">
+          <img src="/public/ESC_logo.png" alt="กวศ.">
+          <span class="nav-brand-name">Operation Support</span>
         </a>
         <div class="nav-links">
-          <a href="dashboard.html"     class="nav-link ${active('dashboard.html')}">หน้าหลัก</a>
-          <a href="items.html"         class="nav-link ${active('items.html')}">อุปกรณ์</a>
-          <a href="projects.html"      class="nav-link ${active('projects.html')}">โครงการ</a>
-          <a href="requests.html"      class="nav-link ${active('requests.html')}">คำขอยืม</a>
-          <span class="nav-notif">
-            <a href="notifications.html" class="nav-link ${active('notifications.html')}">การแจ้งเตือน</a>
-            ${unread > 0 ? `<span class="nav-notif-dot">${unread > 99 ? '99+' : unread}</span>` : ''}
-          </span>
+          <a href="/dashboard/"  class="nav-link ${active('/dashboard')}">หน้าแรก</a>
+          <a href="/projects/"   class="nav-link ${active('/projects')}">โครงการ</a>
+          <a href="/items/"      class="nav-link ${active('/items')}">สต๊อก</a>
+          <a href="/requests/"   class="nav-link ${active('/requests')}">คำขอ</a>
+          <a href="/policy/"     class="nav-link ${active('/policy')}">Policy</a>
+          <a href="/contact/"    class="nav-link ${active('/contact')}">Contact Us</a>
           ${isStaff ? `
             <span class="nav-divider"></span>
-            <a href="admin-items.html"   class="nav-link ${active('admin-items.html')}">จัดการอุปกรณ์</a>
-            <a href="admin-returns.html" class="nav-link ${active('admin-returns.html')}">การคืน</a>
-            ${user.role === 'admin' ? `<a href="admin-users.html" class="nav-link ${active('admin-users.html')}">ผู้ใช้งาน</a>` : ''}
+            <a href="/admin-requests/" class="nav-link nav-link-admin ${active('/admin-requests')}">คำขอ</a>
+            <a href="/admin-returns/"  class="nav-link nav-link-admin ${active('/admin-returns')}">การคืน</a>
+            <a href="/admin-items/"    class="nav-link nav-link-admin ${active('/admin-items')}">คลัง</a>
+            ${user.role === 'admin' ? `<a href="/admin-users/" class="nav-link nav-link-admin ${active('/admin-users')}">ผู้ใช้</a>` : ''}
           ` : ''}
         </div>
         <div class="nav-right">
-          ${user.avatar_url
-            ? `<img src="${h(user.avatar_url)}" alt="${h(user.name)}" class="nav-avatar">`
-            : `<div class="nav-avatar-placeholder">${h(user.name.charAt(0).toUpperCase())}</div>`
-          }
+          <a href="/notifications/" class="nav-bell${seg === '/notifications' ? ' active' : ''}" title="การแจ้งเตือน">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            ${unread > 0 ? `<span class="nav-notif-dot">${unread > 99 ? '99+' : unread}</span>` : ''}
+          </a>
+          <a href="/profile/" title="${h(user.name)}" style="text-decoration:none;flex-shrink:0">
+            ${user.avatar_url
+              ? `<img src="${h(user.avatar_url)}" alt="${h(user.name)}" class="nav-avatar">`
+              : `<div class="nav-avatar-placeholder">${h(user.name.charAt(0).toUpperCase())}</div>`
+            }
+          </a>
           <button class="nav-logout" id="nav-logout-btn">ออกจากระบบ</button>
         </div>
       </div>
     </nav>`;
+
+  renderFooter();
 }
 
 // Open a modal (appends to #modal-root, returns close function)

@@ -7,12 +7,14 @@ import {
 } from '../api.js';
 import { h, statusBadge, formatDateTime, formatCountdown } from '../ui.js';
 
+let countdownInterval = null;
+
 async function init() {
   const user = await requireAuth();
   if (!user) return;
 
   const id = new URLSearchParams(window.location.search).get('id');
-  if (!id) { window.location.href = 'requests.html'; return; }
+  if (!id) { window.location.href = '/requests/'; return; }
 
   const app = document.getElementById('app');
 
@@ -25,6 +27,7 @@ async function init() {
   }
 
   async function renderPage() {
+    clearInterval(countdownInterval);
     const { request, items, returns } = await load();
     const isStaff   = user.role === 'staff' || user.role === 'admin';
     const isOwner   = user.id === request.requester_id;
@@ -68,16 +71,54 @@ async function init() {
         </table>`;
     }
 
+    // Status stepper
+    const FLOW_STEPS = [
+      { key: 'draft',            label: 'ร่าง' },
+      { key: 'pending',          label: 'รอดำเนินการ' },
+      { key: 'processing',       label: 'กำลังดำเนินการ' },
+      { key: 'ready_for_pickup', label: 'พร้อมรับ' },
+      { key: 'in_lend',          label: 'กำลังยืม' },
+      { key: 'returned',         label: 'คืนแล้ว' },
+      { key: 'completed',        label: 'เสร็จสิ้น' },
+    ];
+    const STEP_MAP = { overdue: 4, return_rejected: 5, rejected: 1, cancelled: -1 };
+    const currentStep = STEP_MAP[status] ?? FLOW_STEPS.findIndex(s => s.key === status);
+    const stepper = `
+      <div class="status-stepper">
+        ${FLOW_STEPS.map((step, i) => {
+          const isDone   = i < currentStep;
+          const isActive = i === currentStep;
+          const isSpecialError = isActive && ['overdue','return_rejected','rejected','cancelled'].includes(status);
+          let cls = isDone ? 'done' : isActive ? (isSpecialError ? 'error' : 'active') : '';
+          return `
+            <div class="step-item ${cls}">
+              <div class="step-dot">${isDone ? '✓' : i + 1}</div>
+              <div class="step-label">${step.label}</div>
+            </div>`;
+        }).join('')}
+      </div>`;
+
+    // Context hint for draft stage
+    const draftHint = isOwner && status === 'draft' ? `
+      <div class="flow-hint">
+        <strong>ขั้นตอนที่ 1:</strong> เพิ่มอุปกรณ์ที่ต้องการยืมด้านล่าง แล้วกดปุ่ม "ส่งคำขอ" เพื่อส่งให้เจ้าหน้าที่อนุมัติ
+      </div>` : '';
+
     app.innerHTML = `
       <button class="back-btn" onclick="history.back()">← กลับ</button>
+      ${stepper}
+      ${draftHint}
       <div class="req-header">
         <div class="req-title-row">
           <span class="req-id">#${h(id.slice(0, 8))}</span>
           ${statusBadge(status)}
         </div>
         <div class="actions-bar">
-          ${isOwner && status === 'draft' && items.length > 0
-            ? `<button class="btn btn-success" id="btn-submit">ส่งคำขอ</button>` : ''}
+          ${isOwner && status === 'draft'
+            ? items.length > 0
+              ? `<button class="btn btn-success" id="btn-submit">ส่งคำขอ</button>`
+              : `<button class="btn btn-success" disabled title="กรุณาเพิ่มอุปกรณ์ก่อน" style="opacity:.45">ส่งคำขอ</button>`
+            : ''}
           ${(isOwner || isStaff) && status === 'ready_for_pickup'
             ? `<button class="btn btn-success" id="btn-pickup">ยืนยันการรับ</button>` : ''}
           ${isStaff && status === 'processing' && allPrepared
@@ -92,6 +133,7 @@ async function init() {
       <div class="card">
         <div class="card-title">ข้อมูลคำขอ</div>
         <div class="req-info-grid">
+          ${request.project_name ? `<div class="info-row"><span class="info-label">โครงการ</span><a href="/project-detail/?id=${h(request.project_id)}" style="color:var(--primary)">${h(request.project_name)}</a></div>` : ''}
           <div class="info-row"><span class="info-label">วันที่รับที่ขอ</span><span>${formatDateTime(request.requested_pickup_datetime)}</span></div>
           ${request.confirmed_pickup_datetime ? `<div class="info-row"><span class="info-label">วันที่รับยืนยัน</span><span>${formatDateTime(request.confirmed_pickup_datetime)}</span></div>` : ''}
           <div class="info-row"><span class="info-label">วันที่คืน</span><span>${formatDateTime(request.requested_return_datetime)}</span></div>
@@ -164,6 +206,14 @@ async function init() {
               </div>`).join('')}
           </div>
         </div>` : ''}`;
+
+    if (status === 'ready_for_pickup' && request.pickup_timeout_at) {
+      const updateCountdown = () => {
+        const el = document.querySelector('.countdown');
+        if (el) el.textContent = formatCountdown(request.pickup_timeout_at);
+      };
+      countdownInterval = setInterval(updateCountdown, 30000);
+    }
 
     function errBox(msg) {
       document.getElementById('action-error').innerHTML = `<div class="alert alert-error">${h(msg)}</div>`;

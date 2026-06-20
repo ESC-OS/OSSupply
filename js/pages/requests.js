@@ -16,24 +16,29 @@ async function init() {
   const app = document.getElementById('app');
 
   function renderTable(requests) {
-    if (requests.length === 0) return '<p class="empty-text">ไม่มีคำขอยืม</p>';
+    if (requests.length === 0) return `
+      <div class="dash-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+        </svg>
+        <p>ไม่มีคำขอยืม</p>
+        <a href="/new-request/" class="btn btn-primary btn-sm">สร้างคำขอ</a>
+      </div>`;
     return `
       <div class="table-wrap">
         <table class="data-table">
           <thead>
-            <tr>
-              <th>รหัส</th><th>สถานะ</th><th>วันที่รับ</th><th>วันที่คืน</th>
-            </tr>
+            <tr><th>รหัส</th><th>โครงการ</th><th>สถานะ</th><th>วันที่รับ</th><th>วันที่คืน</th></tr>
           </thead>
           <tbody>
             ${requests.map(r => `
-              <tr>
-                <td><a href="request-detail.html?id=${h(r.id)}" style="color:var(--primary);font-family:monospace;font-weight:600">
-                  #${h(r.id.slice(0, 8))}
-                </a></td>
+              <tr style="cursor:pointer" onclick="window.location.href='/request-detail/?id=${h(r.id)}'">
+                <td><span class="mono" style="color:var(--primary);font-weight:600">#${h(r.id.slice(0,8))}</span></td>
+                <td>${h(r.project_name || '-')}</td>
                 <td>${statusBadge(r.status)}</td>
-                <td>${formatDateTime(r.requested_pickup_datetime)}</td>
-                <td>${formatDateTime(r.requested_return_datetime)}</td>
+                <td style="white-space:nowrap">${formatDateTime(r.requested_pickup_datetime)}</td>
+                <td style="white-space:nowrap">${formatDateTime(r.requested_return_datetime)}</td>
               </tr>`).join('')}
           </tbody>
         </table>
@@ -49,7 +54,7 @@ async function init() {
         <select class="filter-select" id="status-filter">
           ${STATUS_OPTS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}
         </select>
-        <a href="new-request.html" class="btn btn-primary">+ สร้างคำขอ</a>
+        <a href="/new-request/" class="btn btn-primary">+ สร้างคำขอ</a>
       </div>
     </div>
     <div id="req-container">${renderTable(requests)}</div>`;
@@ -62,5 +67,4 @@ async function init() {
     container.innerHTML = renderTable(filtered);
   });
 }
-
 init();
