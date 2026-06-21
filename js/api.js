@@ -34,7 +34,13 @@ export const postLogout = ()   => api.post('/auth/logout');
 export const loginUrl  = ()    => `${BASE}/auth/google`;
 
 // Items
-export const getItems       = (cat)       => api.get(`/items${cat ? '?category=' + encodeURIComponent(cat) : ''}`);
+export const getItems = ({ page = 1, limit = 20, search, category } = {}) => {
+  const p = new URLSearchParams({ page, limit });
+  if (search)   p.set('search',   search);
+  if (category) p.set('category', category);
+  return api.get(`/items?${p}`);
+};
+export const getItemCategories = () => api.get('/items/categories');
 export const getItem        = (id)        => api.get(`/items/${id}`);
 export const createItem     = (data)      => api.post('/items', data);
 export const updateItem     = (id, data)  => api.patch(`/items/${id}`, data);
@@ -82,11 +88,13 @@ export const markNotifRead    = (id)           => api.patch(`/notifications/${id
 export const markAllRead      = ()             => api.patch('/notifications/read-all');
 
 // Users
-export const updateMe      = (data)      => api.patch('/users/me', data);
+export const updateMe         = (data)          => api.patch('/users/me', data);
+export const updateMyProfile  = (data)          => api.patch('/users/me', data);
 
 // Users (admin)
-export const getUsers      = (role) => api.get(`/users${role ? '?role=' + role : ''}`);
-export const updateUserRole = (id, role) => api.patch(`/users/${id}/role`, { role });
+export const getUsers       = (role)          => api.get(`/users${role ? '?role=' + role : ''}`);
+export const updateUserRole = (id, role)      => api.patch(`/users/${id}/role`, { role });
+export const setUserStatus  = (id, isActive) => api.patch(`/users/${id}/status`, { is_active: isActive });
 
 // Upload
 export async function uploadPhoto(file) {

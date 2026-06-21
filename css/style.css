@@ -266,7 +266,7 @@ input, select, textarea { font-family: inherit; }
   box-shadow: 0 1px 0 rgba(0,0,0,.1), var(--shadow-md);
 }
 .nav-inner {
-  max-width: 1140px; margin: 0 auto; padding: 0 1.5rem;
+  max-width: 1320px; margin: 0 auto; padding: 0 2rem;
   height: 60px; display: flex; align-items: center; gap: .75rem;
 }
 .nav-brand {
@@ -342,7 +342,7 @@ input, select, textarea { font-family: inherit; }
 /* =====================================================
    PAGE LAYOUT
    ===================================================== */
-#app { max-width: 1140px; margin: 0 auto; padding: 2rem 1.5rem; }
+#app { max-width: 1320px; margin: 0 auto; padding: 2rem 2rem; }
 @media (max-width: 640px) { #app { padding: 1.25rem 1rem; } }
 
 .page-header {
@@ -376,7 +376,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
   padding: 2.5rem 1.5rem 1.5rem; margin-top: 4rem;
 }
 .footer-inner {
-  max-width: 1140px; margin: 0 auto;
+  max-width: 1320px; margin: 0 auto;
   display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 2.5rem;
   padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,.12);
 }
@@ -496,7 +496,6 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 /* =====================================================
    ITEMS
    ===================================================== */
-.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1.25rem; }
 
 .item-card {
   background: var(--surface); border-radius: var(--radius-md);
@@ -893,3 +892,28 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
   margin-bottom: .75rem;
 }
 .flow-hint strong { font-weight: 700; }
+
+/* =====================================================
+   SEARCH INPUT
+   ===================================================== */
+.search-input {
+  min-width: 280px; flex: 1; max-width: 400px;
+}
+
+/* =====================================================
+   PAGINATION
+   ===================================================== */
+.pagination { display: flex; align-items: center; justify-content: center; gap: .4rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.pagination-info { text-align: center; font-size: .82rem; color: var(--text-muted); margin-top: 1.25rem; }
+.pagination-gap  { color: var(--text-subtle); padding: 0 .2rem; font-size: .85rem; }
+
+.table-pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .75rem 1rem; border-top: 1px solid var(--border);
+  background: var(--bg); font-size: .82rem; color: var(--text-muted);
+}
+
+/* =====================================================
+   ITEMS GRID — desktop: larger minimum cell
+   ===================================================== */
+.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
