@@ -11,7 +11,9 @@ async function req(path, opts = {}) {
     let errKey = null;
     try { const d = await res.json(); msg = d.message || d.error || msg; errKey = d.error; } catch {}
     if (res.status === 403 && errKey === 'profile_incomplete') {
-      window.location.href = '/profile/?required=true';
+      if (!window.location.pathname.startsWith('/profile/')) {
+        window.location.href = '/profile/?required=true';
+      }
       return null;
     }
     throw new Error(msg);
