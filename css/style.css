@@ -929,6 +929,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
   #app {
     max-width: none;
     padding: 2rem 2.5rem;
+    padding-top: calc(64px + 2rem);
   }
 
   #site-footer { margin-top: 0; }
@@ -950,14 +951,27 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
     gap: 0;
   }
 
-  /* Brand at top */
+  /* Brand at top — fixed height so the top-bar line aligns */
   .nav-brand {
-    padding: 1.1rem 1.1rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,.12);
+    height: 64px;
+    padding: 0 1.1rem;
+    border-bottom: 1px solid rgba(255,255,255,.15);
     margin: 0;
     flex-shrink: 0;
   }
   .nav-brand-name { display: block; }
+
+  /* Blank row extending from sidebar edge to right side of screen */
+  .nav::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 240px; right: 0;
+    height: 64px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    z-index: 99;
+    pointer-events: none;
+  }
 
   /* Nav links: vertical list */
   .nav-links {
@@ -1033,9 +1047,9 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
   /* Items grid: more columns, larger cells */
   .items-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 
-  /* Footer inner: restore full width */
-  .footer-inner { max-width: none; padding: 0 1rem; }
-  .footer-bottom { max-width: none; padding: 0 1rem; }
+  /* Footer: hide columns, keep only copyright bar */
+  .footer-inner { display: none; }
+  .footer-bottom { max-width: none; padding: .75rem 1.5rem; }
 }
 
 /* =====================================================
