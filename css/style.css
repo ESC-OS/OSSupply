@@ -1006,7 +1006,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 
   .nav-link-admin { opacity: 1; font-size: .855rem; }
 
-  /* Top-right bar: profile + bell + logout (lifted out of sidebar) */
+  /* Top-right bar: profile + bell (lifted out of sidebar) */
   .nav-right {
     position: fixed;
     top: 0; right: 0;
@@ -1016,6 +1016,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
     padding: 0 1.25rem;
     border-top: none;
     border-left: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
     background: var(--bg);
     gap: .5rem;
     z-index: 101;
@@ -1051,14 +1052,26 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
   .nav-bell .nav-notif-dot { position: static; border: none; margin-left: 0; }
   .nav-bell-label { display: none; }
 
+  /* Logout: back to sidebar bottom */
   .nav-logout {
-    width: auto;
-    padding: .4rem .85rem;
-    background: transparent;
-    border-color: var(--border);
-    color: var(--text-muted);
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 240px;
+    box-sizing: border-box;
+    padding: .65rem 1rem;
+    text-align: center;
+    background: rgba(255,255,255,.08);
+    border: none;
+    border-top: 1px solid rgba(255,255,255,.12);
+    color: rgba(255,255,255,.8);
+    font-size: .82rem;
+    border-radius: 0;
+    z-index: 102;
   }
-  .nav-logout:hover { background: rgba(0,0,0,.06); color: var(--text); }
+  .nav-logout:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+  /* Prevent nav-links content from hiding behind fixed logout button */
+  .nav-links { padding-bottom: 3rem; }
 
   /* ── Content layout: use the full available width ── */
 
