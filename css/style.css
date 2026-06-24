@@ -1006,30 +1006,59 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 
   .nav-link-admin { opacity: 1; font-size: .855rem; }
 
-  /* Bottom: user info + logout */
+  /* Top-right bar: profile + bell + logout (lifted out of sidebar) */
   .nav-right {
-    flex-direction: column;
-    align-items: stretch;
-    padding: .85rem 1rem;
-    border-top: 1px solid rgba(255,255,255,.12);
-    gap: .45rem;
+    position: fixed;
+    top: 0; right: 0;
+    height: 64px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 1.25rem;
+    border-top: none;
+    border-left: 1px solid var(--border);
+    background: var(--bg);
+    gap: .5rem;
+    z-index: 101;
     flex-shrink: 0;
   }
 
-  .nav-profile-link { padding: .4rem .25rem; }
+  /* Light-background color overrides */
+  .nav-profile-link {
+    padding: .3rem .55rem;
+    color: var(--text);
+  }
+  .nav-profile-link:hover { background: rgba(0,0,0,.06); }
+  .nav-profile-link.active { background: rgba(0,0,0,.08); }
+
   .nav-profile-name {
     display: block;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+    color: var(--text);
+  }
+
+  .nav-avatar { border-color: var(--border); }
+  .nav-avatar-placeholder {
+    background: var(--primary);
+    border-color: transparent;
   }
 
   .nav-bell {
-    display: flex; align-items: center; gap: .55rem;
-    padding: .45rem .25rem;
+    display: flex; align-items: center; gap: .35rem;
+    padding: .5rem;
+    color: var(--text-muted);
   }
-  .nav-bell .nav-notif-dot { position: static; border: none; margin-left: auto; }
-  .nav-bell-label { display: block; }
+  .nav-bell:hover { background: rgba(0,0,0,.06); color: var(--text); }
+  .nav-bell .nav-notif-dot { position: static; border: none; margin-left: 0; }
+  .nav-bell-label { display: none; }
 
-  .nav-logout { width: 100%; text-align: center; padding: .5rem .75rem; }
+  .nav-logout {
+    width: auto;
+    padding: .4rem .85rem;
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+  .nav-logout:hover { background: rgba(0,0,0,.06); color: var(--text); }
 
   /* ── Content layout: use the full available width ── */
 
